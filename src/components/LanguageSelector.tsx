@@ -21,7 +21,7 @@ export default function LanguageSelector() {
       dir="ltr"
       role="group"
       aria-label={t.util.language}
-      className="inline-flex items-center rounded-lg bg-gray-100 p-0.5"
+      className="inline-flex items-center rounded-lg bg-surface-2 p-0.5"
     >
       {options.map((lang) => {
         const active = language === lang
@@ -35,8 +35,8 @@ export default function LanguageSelector() {
             title={languageNames[lang]}
             className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors motion-reduce:transition-none ${
               active
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-900'
+                ? 'bg-surface text-content shadow-sm'
+                : 'text-muted hover:text-content'
             }`}
           >
             <span aria-hidden="true">{shortLabel[lang]}</span>

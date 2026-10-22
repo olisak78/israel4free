@@ -44,7 +44,7 @@ export default function DomainCard({
       lang={language}
       dir={dir}
       aria-label={`${t.card.exploreAria(titleText)}${geo ? ` · ${t.card.mapView}` : ''}`}
-      className="group flex items-center gap-3 rounded-card border border-gray-200 bg-white p-3 text-start shadow-card transition duration-200 hover:border-gray-300 hover:shadow-card-hover motion-reduce:transition-none"
+      className="group flex items-center gap-3 rounded-card border border-edge bg-surface p-3 text-start shadow-card transition duration-200 hover:border-faint hover:shadow-card-hover motion-reduce:transition-none"
     >
       {/* Compact icon accent */}
       <span
@@ -55,24 +55,24 @@ export default function DomainCard({
 
       {/* Title + one concise metadata line */}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold text-gray-900">
+        <span className="block truncate text-sm font-semibold text-content">
           {titleText}
         </span>
-        <span className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500">
+        <span className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
           <span className="truncate">
             {/* Illustrative count from the data model — isolated so it never
                 reorders in RTL. */}
-            <bdi className="font-medium text-gray-600">{stat}</bdi> {statLabelText}
+            <bdi className="font-medium text-content">{stat}</bdi> {statLabelText}
           </span>
           {geo && (
-            <MapPin className="h-3 w-3 shrink-0 text-gray-400" aria-hidden="true" />
+            <MapPin className="h-3 w-3 shrink-0 text-faint" aria-hidden="true" />
           )}
         </span>
       </span>
 
       {/* Subtle directional affordance — mirrors in RTL to always point forward */}
       <ChevronRight
-        className="h-4 w-4 shrink-0 text-gray-300 transition-colors group-hover:text-gray-500 motion-reduce:transition-none rtl:-scale-x-100"
+        className="h-4 w-4 shrink-0 text-faint transition-colors group-hover:text-muted motion-reduce:transition-none rtl:-scale-x-100"
         aria-hidden="true"
       />
     </button>

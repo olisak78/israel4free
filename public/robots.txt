@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://israel4free.com/sitemap.xml

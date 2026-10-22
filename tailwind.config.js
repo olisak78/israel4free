@@ -1,8 +1,46 @@
+/** Semantic color token → CSS custom property. Channels are stored as
+ *  space-separated RGB in index.css so Tailwind's <alpha-value> keeps working
+ *  (e.g. `bg-surface/80`). Light and dark values live under :root and .dark. */
+const token = (name) => `rgb(var(${name}) / <alpha-value>)`
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  // Two-theme switcher: the `.dark` class on <html> flips every semantic token.
+  darkMode: 'class',
   theme: {
     extend: {
+      colors: {
+        // Surfaces
+        page: token('--c-page'),
+        surface: {
+          DEFAULT: token('--c-surface'),
+          2: token('--c-surface-2'),
+          3: token('--c-elevated'),
+        },
+        // Text
+        content: token('--c-content'),
+        muted: token('--c-muted'),
+        faint: token('--c-faint'),
+        // Lines
+        edge: token('--c-edge'),
+        // Accent
+        brand: {
+          DEFAULT: token('--c-brand'),
+          hover: token('--c-brand-hover'),
+          fg: token('--c-brand-fg'),
+          soft: token('--c-brand-soft'),
+          'soft-fg': token('--c-brand-soft-fg'),
+        },
+        // Form + focus
+        focus: token('--c-focus'),
+        field: token('--c-field'),
+        placeholder: token('--c-placeholder'),
+        // Status
+        success: token('--c-success'),
+        warning: token('--c-warning'),
+        danger: token('--c-danger'),
+      },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         hebrew: ['Heebo', 'Inter', 'system-ui', 'sans-serif'],

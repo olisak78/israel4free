@@ -24,11 +24,22 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Keep the document's language and direction in sync. This is the ONLY place
   // that touches `dir` on the document — text flow derives from here, while the
   // application shell pins its physical layout independently (see Header/App).
+  // It also applies per-language SEO metadata so Google's rendered DOM and
+  // link-preview scrapers see the correct title/description for each language.
   useEffect(() => {
     const root = document.documentElement
     root.lang = language
     root.dir = direction[language]
     window.localStorage.setItem(STORAGE_KEY, language)
+
+    const { meta } = dictionaries[language]
+    document.title = meta.title
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute('content', meta.description)
+    document
+      .querySelector('meta[property="og:locale"]')
+      ?.setAttribute('content', meta.ogLocale)
   }, [language])
 
   const setLanguage = useCallback((lang: Language) => setLanguageState(lang), [])

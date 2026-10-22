@@ -22,6 +22,15 @@ export const languageNames: Record<Language, string> = {
 }
 
 const en = {
+  // Document-level SEO metadata, applied to <title>/description/og:locale when
+  // this language is active. Kept natural and specific — no keyword stuffing.
+  meta: {
+    title:
+      'Israel Open Data Portal — Vehicles, Flights, ATMs & More | Israel4Free',
+    description:
+      "Search Israeli vehicle licenses, flights, ATMs, pharmacies and public transit in one fast, clean interface over Israel's open government data. Free, no sign-up.",
+    ogLocale: 'en_US',
+  },
   brand: {
     name: 'Israel4Free',
     tagline: 'Open Data Portal',
@@ -43,6 +52,9 @@ const en = {
     settings: 'Settings',
     about: 'About',
     language: 'Language',
+    theme: 'Theme',
+    toLight: 'Switch to light mode',
+    toDark: 'Switch to dark mode',
   },
   hero: {
     eyebrow: 'Israeli public data',
@@ -73,7 +85,7 @@ const en = {
   footer: {
     line1Lead: 'Data sourced from',
     line1Tail: '· Israel Open Government Data',
-    line2: 'An independent open-source project',
+    line2: '© Blue Acara Project™',
   },
 }
 
@@ -81,6 +93,12 @@ const en = {
 export type Dict = typeof en
 
 const he: Dict = {
+  meta: {
+    title: 'פורטל מידע ממשלתי פתוח — רכב, טיסות, כספומטים ועוד | Israel4Free',
+    description:
+      'חיפוש רישוי רכב, טיסות, כספומטים, בתי מרקחת ותחבורה ציבורית בממשק מהיר ונקי מעל מאגרי המידע הממשלתיים הפתוחים של ישראל. חינם, ללא הרשמה.',
+    ogLocale: 'he_IL',
+  },
   brand: {
     name: 'Israel4Free',
     tagline: 'פורטל מידע פתוח',
@@ -102,6 +120,9 @@ const he: Dict = {
     settings: 'הגדרות',
     about: 'אודות',
     language: 'שפה',
+    theme: 'ערכת נושא',
+    toLight: 'מעבר למצב בהיר',
+    toDark: 'מעבר למצב כהה',
   },
   hero: {
     eyebrow: 'מידע ציבורי ישראלי',

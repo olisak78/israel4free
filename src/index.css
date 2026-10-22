@@ -3,6 +3,68 @@
 @tailwind utilities;
 
 @layer base {
+  /* Semantic design tokens — single source of truth for every color in the UI.
+     Channels are space-separated RGB so Tailwind's <alpha-value> keeps working
+     (e.g. `bg-surface/80`). Components never hardcode light/dark colors; they
+     reference these tokens, and the active theme (`.dark` on <html>) swaps them. */
+  :root {
+    --c-page: 249 250 251; /* gray-50  — soft neutral page background */
+    --c-surface: 255 255 255; /* white    — cards, header */
+    --c-surface-2: 243 244 246; /* gray-100 — secondary surface, hover fills */
+    --c-elevated: 255 255 255; /* white    — dropdowns, dialogs */
+
+    --c-content: 17 24 39; /* gray-900 — primary text */
+    --c-muted: 107 114 128; /* gray-500 — secondary text */
+    --c-faint: 156 163 175; /* gray-400 — tertiary text, icons */
+
+    --c-edge: 229 231 235; /* gray-200 — borders, dividers */
+
+    --c-brand: 37 99 235; /* blue-600 — primary accent */
+    --c-brand-hover: 29 78 216; /* blue-700 */
+    --c-brand-fg: 255 255 255; /* text on a solid accent fill */
+    --c-brand-soft: 239 246 255; /* blue-50  — selected / active backgrounds */
+    --c-brand-soft-fg: 29 78 216; /* blue-700 — text on soft accent */
+
+    --c-focus: 59 130 246; /* blue-500 — focus ring */
+    --c-field: 243 244 246; /* gray-100 — input background */
+    --c-placeholder: 156 163 175; /* gray-400 — placeholder text */
+
+    --c-success: 5 150 105; /* emerald-600 */
+    --c-warning: 217 119 6; /* amber-600 */
+    --c-danger: 220 38 38; /* red-600 */
+
+    color-scheme: light;
+  }
+
+  .dark {
+    --c-page: 15 23 42; /* slate-900 — deep navy page background */
+    --c-surface: 30 41 59; /* slate-800 — cards, header */
+    --c-surface-2: 51 65 85; /* slate-700 — secondary surface, hover fills */
+    --c-elevated: 51 65 85; /* slate-700 — dropdowns, dialogs */
+
+    --c-content: 241 245 249; /* slate-100 — primary text */
+    --c-muted: 148 163 184; /* slate-400 — secondary text */
+    --c-faint: 116 128 149; /* slate ~500 — tertiary text, icons */
+
+    --c-edge: 51 65 85; /* slate-700 — borders visible on dark surfaces */
+
+    --c-brand: 96 165 250; /* blue-400 — accent, brightened for dark */
+    --c-brand-hover: 147 197 253; /* blue-300 */
+    --c-brand-fg: 15 23 42; /* slate-900 — dark text on bright accent */
+    --c-brand-soft: 30 58 95; /* deep blue tint — selected / active */
+    --c-brand-soft-fg: 191 219 254; /* blue-200 — text on soft accent */
+
+    --c-focus: 96 165 250; /* blue-400 */
+    --c-field: 51 65 85; /* slate-700 — input background */
+    --c-placeholder: 116 128 149; /* slate ~500 */
+
+    --c-success: 52 211 153; /* emerald-400 */
+    --c-warning: 251 191 36; /* amber-400 */
+    --c-danger: 248 113 113; /* red-400 */
+
+    color-scheme: dark;
+  }
+
   html {
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -10,7 +72,7 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-page text-content;
   }
 
   /* Hebrew content gets a typeface tuned for it and flows right-to-left */
@@ -18,9 +80,39 @@
     font-family: 'Heebo', 'Inter', system-ui, sans-serif;
   }
 
-  /* Consistent, visible keyboard focus across the app */
+  /* Consistent, visible keyboard focus across both themes */
   :focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+    @apply outline-none ring-2 ring-focus ring-offset-2 ring-offset-page;
+  }
+
+  /* Restrained, app-wide color transition so theme switches ease rather than
+     snap. Only color-ish properties animate (never layout/transform), and the
+     reduced-motion block below neutralizes it. Tailwind's own transition
+     utilities (later layer) still win on elements that declare them. */
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+  }
+
+  /* Themed scrollbars so the chrome matches the active surface */
+  * {
+    scrollbar-color: rgb(var(--c-faint) / 0.6) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--c-faint) / 0.5);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--c-faint) / 0.8);
   }
 }
 
