@@ -1,16 +1,22 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { SearchX } from 'lucide-react'
 import DomainCard from '../components/DomainCard'
 import {
   categories,
+  categoryLabel,
   datasets,
-  type CategoryId,
+  type Filter,
 } from '../data/datasets'
+import { useLanguage, useT } from '../i18n/useLanguage'
 
-type Filter = CategoryId | 'all'
+interface HomeProps {
+  filter: Filter
+  onFilterChange: (filter: Filter) => void
+}
 
-export default function Home() {
-  const [filter, setFilter] = useState<Filter>('all')
+export default function Home({ filter, onFilterChange }: HomeProps) {
+  const t = useT()
+  const { language } = useLanguage()
 
   const visible = useMemo(
     () =>
@@ -21,75 +27,77 @@ export default function Home() {
   )
 
   const filters: { id: Filter; label: string }[] = [
-    { id: 'all', label: 'All' },
-    ...categories.map((c) => ({ id: c.id, label: c.label })),
+    { id: 'all', label: t.datasets.all },
+    ...categories.map((c) => ({
+      id: c.id,
+      label: categoryLabel(c.id, language),
+    })),
   ]
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8 sm:px-8 sm:py-10">
-      {/* Hero — compact, single purpose */}
-      <section className="mb-8">
+      {/* Hero — compact, centered (direction-neutral) */}
+      <section className="mb-8 text-center">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-blue-600">
-          Israeli public data
+          {t.hero.eyebrow}
         </p>
         <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-[2.5rem] sm:leading-[1.1]">
-          Israel Open Data, <span className="text-blue-600">made usable</span>
+          {t.hero.titleLead}{' '}
+          <span className="text-blue-600">{t.hero.titleAccent}</span>
         </h1>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-gray-500">
-          A fast, clean interface over Israel's public government datasets —
-          search vehicles, track flights, find ATMs, and more, all in one place.
+        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-gray-500">
+          {t.hero.subtitle}
         </p>
 
-        {/* Honest, derived metrics strip (no live/operational claims) */}
-        <dl className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+        {/* Honest, derived metrics strip (no live/operational claims).
+            Numbers are isolated with <bdi> so they never reorder in RTL. */}
+        <dl className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
           <div className="flex items-baseline gap-1.5">
-            <dt className="sr-only">Datasets</dt>
-            <dd className="font-semibold text-gray-900">{datasets.length}</dd>
-            <span className="text-gray-500">datasets</span>
+            <dt className="sr-only">{t.stats.datasets}</dt>
+            <dd className="font-semibold text-gray-900">
+              <bdi>{datasets.length}</bdi>
+            </dd>
+            <span className="text-gray-500">{t.stats.datasets}</span>
           </div>
           <span className="hidden h-4 w-px bg-gray-200 sm:block" aria-hidden="true" />
           <div className="flex items-baseline gap-1.5">
-            <dt className="sr-only">Categories</dt>
-            <dd className="font-semibold text-gray-900">{categories.length}</dd>
-            <span className="text-gray-500">categories</span>
+            <dt className="sr-only">{t.stats.categories}</dt>
+            <dd className="font-semibold text-gray-900">
+              <bdi>{categories.length}</bdi>
+            </dd>
+            <span className="text-gray-500">{t.stats.categories}</span>
           </div>
           <span className="hidden h-4 w-px bg-gray-200 sm:block" aria-hidden="true" />
           <div className="flex items-baseline gap-1.5">
-            <dt className="sr-only">Source</dt>
-            <dd className="font-medium text-gray-700">data.gov.il</dd>
+            <dt className="sr-only">data.gov.il</dt>
+            <dd className="font-medium text-gray-700">
+              <bdi>data.gov.il</bdi>
+            </dd>
           </div>
           <span className="hidden h-4 w-px bg-gray-200 sm:block" aria-hidden="true" />
           <div className="flex items-baseline gap-1.5">
-            <dt className="sr-only">Access</dt>
-            <dd className="font-medium text-gray-700">Free · no sign-up</dd>
+            <dd className="font-medium text-gray-700">{t.stats.access}</dd>
           </div>
         </dl>
       </section>
 
       {/* Datasets — the primary focus */}
       <section aria-labelledby="datasets-heading">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2
-              id="datasets-heading"
-              className="text-lg font-semibold text-gray-900"
-            >
-              Browse datasets
-            </h2>
-            <p className="mt-0.5 text-sm text-gray-500">
-              Pick a category to start exploring
-            </p>
-          </div>
-          <p className="text-sm text-gray-400" aria-live="polite">
-            {visible.length} of {datasets.length} shown
-          </p>
+        <div className="mb-5 text-center">
+          <h2
+            id="datasets-heading"
+            className="text-lg font-semibold text-gray-900"
+          >
+            {t.datasets.heading}
+          </h2>
+          <p className="mt-0.5 text-sm text-gray-500">{t.datasets.subheading}</p>
         </div>
 
-        {/* Category filter */}
+        {/* Category filter — centered, kept in sync with the header navigation */}
         <div
           role="group"
-          aria-label="Filter datasets by category"
-          className="mb-6 flex flex-wrap gap-2"
+          aria-label={t.datasets.filterLabel}
+          className="mb-3 flex flex-wrap justify-center gap-2"
         >
           {filters.map((f) => {
             const active = filter === f.id
@@ -98,7 +106,7 @@ export default function Home() {
                 key={f.id}
                 type="button"
                 aria-pressed={active}
-                onClick={() => setFilter(f.id)}
+                onClick={() => onFilterChange(f.id)}
                 className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition duration-150 motion-reduce:transition-none ${
                   active
                     ? 'border-blue-600 bg-blue-600 text-white'
@@ -111,8 +119,20 @@ export default function Home() {
           })}
         </div>
 
+        <p
+          className="mb-6 text-center text-sm text-gray-400"
+          aria-live="polite"
+        >
+          {t.datasets.shown(visible.length, datasets.length)}
+        </p>
+
         {visible.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          // dir="ltr" keeps the card grid in a fixed physical order across
+          // languages; each card renders its own text in the correct direction.
+          <div
+            dir="ltr"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+          >
             {visible.map((d) => (
               <DomainCard key={d.id} {...d} />
             ))}
@@ -121,26 +141,26 @@ export default function Home() {
           <div className="flex flex-col items-center rounded-card border border-dashed border-gray-300 bg-white py-16 text-center">
             <SearchX className="h-8 w-8 text-gray-300" aria-hidden="true" />
             <p className="mt-3 text-sm font-medium text-gray-900">
-              No datasets in this category yet
+              {t.datasets.emptyTitle}
             </p>
             <button
               type="button"
-              onClick={() => setFilter('all')}
+              onClick={() => onFilterChange('all')}
               className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-700"
             >
-              Show all datasets
+              {t.datasets.emptyCta}
             </button>
           </div>
         )}
       </section>
 
-      {/* Footer */}
-      <footer className="mt-12 flex flex-col items-start justify-between gap-2 border-t border-gray-200 pt-6 text-xs text-gray-400 sm:flex-row sm:items-center">
+      {/* Footer — centered */}
+      <footer className="mt-12 flex flex-col items-center gap-1.5 border-t border-gray-200 pt-6 text-center text-xs text-gray-400">
         <span>
-          Data sourced from <span className="text-gray-600">data.gov.il</span> ·
-          Israel Open Government Data
+          {t.footer.line1Lead}{' '}
+          <bdi className="text-gray-600">data.gov.il</bdi> {t.footer.line1Tail}
         </span>
-        <span>An independent open-source project</span>
+        <span>{t.footer.line2}</span>
       </footer>
     </div>
   )

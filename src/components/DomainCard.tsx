@@ -1,15 +1,15 @@
-import { ArrowRight, MapPin } from 'lucide-react'
-import { categoryLabels, type Dataset } from '../data/datasets'
+import { ChevronRight, MapPin } from 'lucide-react'
+import { type Dataset } from '../data/datasets'
+import { useLanguage, useT } from '../i18n/useLanguage'
 
 type DomainCardProps = Pick<
   Dataset,
   | 'title'
   | 'titleHe'
-  | 'description'
   | 'stat'
   | 'statLabel'
+  | 'statLabelHe'
   | 'icon'
-  | 'category'
   | 'accentBg'
   | 'accentText'
   | 'geo'
@@ -18,68 +18,63 @@ type DomainCardProps = Pick<
 export default function DomainCard({
   title,
   titleHe,
-  description,
   stat,
   statLabel,
+  statLabelHe,
   icon: Icon,
-  category,
   accentBg,
   accentText,
   geo,
 }: DomainCardProps) {
+  const { language, dir } = useLanguage()
+  const t = useT()
+
+  const isHe = language === 'he'
+  // Only the active language's title is shown — the interface language already
+  // tells the user which name applies, so showing both just adds height.
+  const titleText = isHe ? titleHe : title
+  const statLabelText = isHe ? statLabelHe : statLabel
+
   return (
+    // lang drives the Hebrew typeface (:lang(he)); dir makes the internal layout
+    // follow reading order (icon leads, chevron trails) while the grid keeps the
+    // cards in a fixed physical order. The whole tile is a single control.
     <button
       type="button"
-      aria-label={`Explore the ${title} dataset`}
-      className="group flex h-full flex-col rounded-card border border-gray-200 bg-white p-5 text-left shadow-card transition duration-200 hover:border-gray-300 hover:shadow-card-hover motion-reduce:transition-none"
+      lang={language}
+      dir={dir}
+      aria-label={`${t.card.exploreAria(titleText)}${geo ? ` · ${t.card.mapView}` : ''}`}
+      className="group flex items-center gap-3 rounded-card border border-gray-200 bg-white p-3 text-start shadow-card transition duration-200 hover:border-gray-300 hover:shadow-card-hover motion-reduce:transition-none"
     >
-      {/* Coherent header: icon accent · category · stat */}
-      <div className="mb-4 flex items-start justify-between">
-        <span
-          className={`flex h-11 w-11 items-center justify-center rounded-xl ${accentBg}`}
-        >
-          <Icon className={`h-5 w-5 ${accentText}`} strokeWidth={2} />
+      {/* Compact icon accent */}
+      <span
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${accentBg}`}
+      >
+        <Icon className={`h-5 w-5 ${accentText}`} strokeWidth={2} aria-hidden="true" />
+      </span>
+
+      {/* Title + one concise metadata line */}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-semibold text-gray-900">
+          {titleText}
         </span>
-        <div className="text-right">
-          <div className="text-lg font-semibold leading-none text-gray-900">
-            {stat}
-          </div>
-          <div className="mt-1 text-xs text-gray-400">{statLabel}</div>
-        </div>
-      </div>
-
-      {/* Title + Hebrew name */}
-      <div className="mb-1.5 flex items-baseline gap-2">
-        <h3 className="text-base font-semibold leading-snug text-gray-900">
-          {title}
-        </h3>
-        <span lang="he" dir="rtl" className="font-hebrew text-sm text-gray-400">
-          {titleHe}
-        </span>
-      </div>
-
-      <p className="flex-1 text-sm leading-relaxed text-gray-500">{description}</p>
-
-      {/* Footer: category + geo cue · explore */}
-      <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
-            {categoryLabels[category]}
+        <span className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500">
+          <span className="truncate">
+            {/* Illustrative count from the data model — isolated so it never
+                reorders in RTL. */}
+            <bdi className="font-medium text-gray-600">{stat}</bdi> {statLabelText}
           </span>
           {geo && (
-            <span className="inline-flex items-center gap-1 text-xs text-gray-400">
-              <MapPin className="h-3 w-3" aria-hidden="true" />
-              Map view
-            </span>
+            <MapPin className="h-3 w-3 shrink-0 text-gray-400" aria-hidden="true" />
           )}
-        </div>
-        <span
-          className={`inline-flex items-center gap-1 text-sm font-medium ${accentText} transition-all group-hover:gap-1.5 motion-reduce:transition-none`}
-        >
-          Explore
-          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
         </span>
-      </div>
+      </span>
+
+      {/* Subtle directional affordance — mirrors in RTL to always point forward */}
+      <ChevronRight
+        className="h-4 w-4 shrink-0 text-gray-300 transition-colors group-hover:text-gray-500 motion-reduce:transition-none rtl:-scale-x-100"
+        aria-hidden="true"
+      />
     </button>
   )
 }
