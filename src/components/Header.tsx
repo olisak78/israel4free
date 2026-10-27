@@ -1,81 +1,68 @@
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import {
   Car,
   Home as HomeIcon,
   MapPin,
   Menu,
   Radio,
-  Search,
   Settings,
   X,
   type LucideIcon,
 } from 'lucide-react'
-import logoLight from '../images/logo.png'
+import logoLight from '../images/main-logo.png'
 import logoDark from '../images/dark-logo.png'
 import { useLanguage } from '../i18n/useLanguage'
 import { useTheme } from '../theme/useTheme'
-import type { Filter } from '../data/datasets'
+import { datasets, type CategoryId } from '../data/datasets'
 import LanguageSelector from './LanguageSelector'
 import ThemeToggle from './ThemeToggle'
 
-interface HeaderProps {
-  /** Active top-level section, shared with the Home page's category filter. */
-  activeFilter: Filter
-  onSelectFilter: (filter: Filter) => void
-}
-
 interface NavItem {
-  filter: Filter
+  /** Destination route. Category items land on Home with a `?c=` filter. */
+  to: string
+  /** Category this item represents, for active-state matching. */
+  category: CategoryId | 'all'
   icon: LucideIcon
   label: string
 }
 
-export default function Header({ activeFilter, onSelectFilter }: HeaderProps) {
-  const { dir, t } = useLanguage()
+export default function Header() {
+  const { t } = useLanguage()
   const { theme } = useTheme()
+  const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Each theme has its own brand asset — no CSS filters. The initial render
-  // already reflects the persisted theme, so the correct logo shows with no
-  // flash on load or after a toggle.
+  // Light mode shows the full-color lockup; dark mode swaps to the
+  // dark-optimized asset. The initial render already reflects the persisted
+  // theme, so the correct logo shows with no flash on load or after a toggle.
   const logo = theme === 'dark' ? logoDark : logoLight
 
   const navItems: NavItem[] = [
-    { filter: 'all', icon: HomeIcon, label: t.nav.home },
-    { filter: 'transport', icon: Car, label: t.nav.transport },
-    { filter: 'locations', icon: MapPin, label: t.nav.locations },
-    { filter: 'infrastructure', icon: Radio, label: t.nav.infrastructure },
+    { to: '/', category: 'all', icon: HomeIcon, label: t.nav.home },
+    { to: '/?c=transport', category: 'transport', icon: Car, label: t.nav.transport },
+    { to: '/?c=locations', category: 'locations', icon: MapPin, label: t.nav.locations },
+    { to: '/?c=infrastructure', category: 'infrastructure', icon: Radio, label: t.nav.infrastructure },
   ]
 
-  function handleSelect(filter: Filter) {
-    onSelectFilter(filter)
-    setMenuOpen(false)
-  }
+  // Which nav item should read as active. On a dataset page, highlight the
+  // category that page belongs to; on Home, highlight the active `?c=` filter
+  // (or "Home" when unfiltered).
+  const activeCategory: CategoryId | 'all' = (() => {
+    const onDatasetPage = datasets.find((d) => d.path === location.pathname)
+    if (onDatasetPage) return onDatasetPage.category
+    if (location.pathname === '/') {
+      const c = new URLSearchParams(location.search).get('c')
+      if (c === 'transport' || c === 'locations' || c === 'infrastructure') return c
+      return 'all'
+    }
+    return 'all' // unknown route (404) — nothing active
+  })()
 
-  /** Search field, reused in the desktop header row and the mobile panel.
-   *  Its wrapper follows the active language direction so the icon always sits
-   *  on the leading edge and the shortcut hint on the trailing edge. */
-  const searchField = (id: string) => (
-    <div dir={dir} className="relative w-full">
-      <label htmlFor={id} className="sr-only">
-        {t.search.label}
-      </label>
-      <Search
-        className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-faint"
-        aria-hidden="true"
-      />
-      <input
-        id={id}
-        type="search"
-        dir="auto"
-        placeholder={t.search.placeholder}
-        className="w-full rounded-lg bg-field py-2 pe-16 ps-9 text-sm text-content transition-colors placeholder:text-placeholder focus:bg-surface focus:outline-none focus:ring-2 focus:ring-focus"
-      />
-      <kbd className="pointer-events-none absolute end-2.5 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded border border-edge bg-surface px-1.5 py-0.5 font-sans text-[11px] font-medium text-faint sm:flex">
-        ⌘K
-      </kbd>
-    </div>
-  )
+  const isActive = (item: NavItem) =>
+    location.pathname === '/' || datasets.some((d) => d.path === location.pathname)
+      ? item.category === activeCategory
+      : false
 
   return (
     <header className="sticky top-0 z-30 border-b border-edge bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
@@ -83,36 +70,47 @@ export default function Header({ activeFilter, onSelectFilter }: HeaderProps) {
           on the left and utilities on the right in every language. */}
       <div
         dir="ltr"
-        className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6"
+        className="mx-auto flex h-28 max-w-6xl items-center gap-3 px-4 sm:px-6"
       >
-        {/* Brand — physical start */}
-        <a
-          href="#main"
-          onClick={(e) => {
-            e.preventDefault()
-            handleSelect('all')
-          }}
-          className="flex shrink-0 items-center gap-2.5 rounded-lg"
+        {/* Brand — physical start, nudged toward center. Links home. The logo
+            image is a full lockup (icon + wordmark + tagline). */}
+        <Link
+          to="/"
+          onClick={() => setMenuOpen(false)}
+          aria-label={t.brand.name}
+          className="flex shrink-0 items-center rounded-lg ms-4 sm:ms-10 lg:ms-20"
         >
-          <img
-            src={logo}
-            alt={t.brand.name}
-            className={`object-contain ${theme === 'dark' ? 'h-8 w-16' : 'h-16 w-32'}`}
-          />
-          <span className="flex flex-col leading-none">
-            <span className="text-sm font-bold text-content">
-              {t.brand.name}
-            </span>
-            <span className="mt-1 hidden text-xs text-faint sm:block">
-              {t.brand.tagline}
-            </span>
-          </span>
-        </a>
+          <img src={logo} alt={t.brand.name} className="h-24 w-auto" />
+        </Link>
 
-        {/* Search — grows and centers (desktop only; mobile has its own row) */}
-        <div className="hidden min-w-0 flex-1 justify-center md:flex">
-          <div className="w-full max-w-md">{searchField('global-search')}</div>
-        </div>
+        {/* Primary navigation — centered in the row. Desktop only; mobile uses
+            the collapsible panel below. */}
+        <nav
+          aria-label={t.nav.label}
+          className="hidden min-w-0 flex-1 justify-center md:flex"
+        >
+          <ul className="flex items-center gap-1">
+            {navItems.map((item) => {
+              const active = isActive(item)
+              return (
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors motion-reduce:transition-none ${
+                      active
+                        ? 'bg-brand-soft text-brand-soft-fg'
+                        : 'text-muted hover:bg-surface-2 hover:text-content'
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    {item.label}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
 
         {/* Utilities — physical end */}
         <div className="ms-auto flex shrink-0 items-center gap-2">
@@ -135,48 +133,10 @@ export default function Header({ activeFilter, onSelectFilter }: HeaderProps) {
             aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
             className="rounded-lg p-2 text-muted transition-colors hover:bg-surface-2 hover:text-content md:hidden"
           >
-            {menuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
-
-      {/* Row 2 — primary navigation, centered. dir="ltr" keeps the tab order
-          physically identical across languages (labels still read correctly). */}
-      <nav
-        aria-label={t.nav.label}
-        dir="ltr"
-        className="mx-auto hidden max-w-6xl justify-center px-4 pb-2 md:flex"
-      >
-        <ul className="flex items-center gap-1">
-          {navItems.map((item) => {
-            const active = item.filter === activeFilter
-            return (
-              <li key={item.filter}>
-                <button
-                  type="button"
-                  aria-current={active ? 'page' : undefined}
-                  onClick={() => handleSelect(item.filter)}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors motion-reduce:transition-none ${
-                    active
-                      ? 'bg-brand-soft text-brand-soft-fg'
-                      : 'text-muted hover:bg-surface-2 hover:text-content'
-                  }`}
-                >
-                  <item.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  {item.label}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
-
-      {/* Mobile search — always visible so search is never hidden behind a menu */}
-      <div className="px-4 pb-3 md:hidden">{searchField('global-search-mobile')}</div>
 
       {/* Mobile nav panel — collapsible disclosure */}
       {menuOpen && (
@@ -187,13 +147,13 @@ export default function Header({ activeFilter, onSelectFilter }: HeaderProps) {
         >
           <ul className="space-y-0.5">
             {navItems.map((item) => {
-              const active = item.filter === activeFilter
+              const active = isActive(item)
               return (
-                <li key={item.filter}>
-                  <button
-                    type="button"
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
                     aria-current={active ? 'page' : undefined}
-                    onClick={() => handleSelect(item.filter)}
+                    onClick={() => setMenuOpen(false)}
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors motion-reduce:transition-none ${
                       active
                         ? 'bg-brand-soft text-brand-soft-fg'
@@ -202,7 +162,7 @@ export default function Header({ activeFilter, onSelectFilter }: HeaderProps) {
                   >
                     <item.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                     {item.label}
-                  </button>
+                  </Link>
                 </li>
               )
             })}

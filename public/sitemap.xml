@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- The app is a single client-rendered page served at one URL; English and
-     Hebrew are a client-side toggle, not separate URLs, so there is one
-     canonical entry. Add per-tool/per-language URLs here if routing is added. -->
+<!-- One canonical entry per route. English and Hebrew are a client-side toggle,
+     not separate URLs, so each route has a single canonical entry. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://israel4free.com/</loc>
+    <loc>https://mygovil.com/</loc>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://mygovil.com/car-licenses</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mygovil.com/flights</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mygovil.com/atm-locations</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mygovil.com/cell-antennas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mygovil.com/public-transit</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mygovil.com/pharmacies</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

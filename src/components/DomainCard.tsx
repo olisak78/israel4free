@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom'
 import { ChevronRight, MapPin } from 'lucide-react'
 import { type Dataset } from '../data/datasets'
 import { useLanguage, useT } from '../i18n/useLanguage'
 
 type DomainCardProps = Pick<
   Dataset,
+  | 'path'
   | 'title'
   | 'titleHe'
   | 'stat'
@@ -16,6 +18,7 @@ type DomainCardProps = Pick<
 >
 
 export default function DomainCard({
+  path,
   title,
   titleHe,
   stat,
@@ -36,11 +39,13 @@ export default function DomainCard({
   const statLabelText = isHe ? statLabelHe : statLabel
 
   return (
+    // A real anchor (router Link) to the dedicated page — keyboard focusable,
+    // opens in a new tab on ctrl/cmd-click, and works with browser history.
     // lang drives the Hebrew typeface (:lang(he)); dir makes the internal layout
     // follow reading order (icon leads, chevron trails) while the grid keeps the
-    // cards in a fixed physical order. The whole tile is a single control.
-    <button
-      type="button"
+    // cards in a fixed physical order.
+    <Link
+      to={path}
       lang={language}
       dir={dir}
       aria-label={`${t.card.exploreAria(titleText)}${geo ? ` · ${t.card.mapView}` : ''}`}
@@ -75,6 +80,6 @@ export default function DomainCard({
         className="h-4 w-4 shrink-0 text-faint transition-colors group-hover:text-muted motion-reduce:transition-none rtl:-scale-x-100"
         aria-hidden="true"
       />
-    </button>
+    </Link>
   )
 }
