@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { SearchX } from 'lucide-react'
 import DomainCard from '../components/DomainCard'
 import OrganizationCard from '../components/OrganizationCard'
 import GlobalSearch from '../components/GlobalSearch'
 import Footer from '../components/Footer'
+import { scrollToSection } from '../lib/scrollToSection'
 import {
   categories,
   categoryLabel,
@@ -29,6 +30,20 @@ export default function Home() {
   const { language } = useLanguage()
 
   const popular = useMemo(() => popularDatasets(), [])
+
+  // When arriving from a header nav item (either on another route, via router
+  // state, or a direct `/#organizations` hash link), scroll to the requested
+  // section once the page has laid out. Runs per navigation (location.key).
+  const location = useLocation()
+  useEffect(() => {
+    const state = location.state as { scrollTo?: string } | null
+    const target =
+      state?.scrollTo ?? (location.hash ? location.hash.slice(1) : '')
+    if (!target || target === 'top') return
+    // rAF lets layout settle (and runs after ScrollToTop's instant jump).
+    const id = requestAnimationFrame(() => scrollToSection(target))
+    return () => cancelAnimationFrame(id)
+  }, [location.key, location.hash, location.state])
 
   // The topic filter lives in the URL (`/?c=transport`), so it is shareable,
   // survives refresh, and participates in browser back/forward navigation. The
@@ -110,7 +125,7 @@ export default function Home() {
       </section>
 
       {/* ── Popular datasets — direct access to the most-used tools ────────── */}
-      <section aria-labelledby="popular-heading" className="mb-12">
+      <section id="popular" aria-labelledby="popular-heading" className="mb-12">
         <div className="mb-4">
           <h2 id="popular-heading" className="text-lg font-semibold text-content">
             {t.home.popularHeading}
@@ -129,7 +144,7 @@ export default function Home() {
       </section>
 
       {/* ── Browse by government organization — the primary structure ──────── */}
-      <section aria-labelledby="orgs-heading" className="mb-12">
+      <section id="organizations" aria-labelledby="orgs-heading" className="mb-12">
         <div className="mb-4">
           <h2 id="orgs-heading" className="text-lg font-semibold text-content">
             {t.home.orgsHeading}
@@ -160,7 +175,7 @@ export default function Home() {
       </section>
 
       {/* ── Browse by topic — secondary discovery, no org knowledge needed ─── */}
-      <section aria-labelledby="topics-heading">
+      <section id="topics" aria-labelledby="topics-heading">
         <div className="mb-4">
           <h2 id="topics-heading" className="text-lg font-semibold text-content">
             {t.home.topicsHeading}

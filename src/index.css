@@ -126,3 +126,63 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Leaflet map — align controls, attribution, and popups with the theme tokens
+   so the real ATM map reads as part of the app in both light and dark mode. */
+@layer components {
+  .leaflet-container {
+    background-color: rgb(var(--c-surface-2));
+    font-family: inherit;
+  }
+  /* Dark mode: OSM has no dark tiles, so darken the tile pane only (markers and
+     popups live in other panes and stay untouched). */
+  .dark .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+  }
+  .leaflet-control-attribution {
+    background-color: rgb(var(--c-surface) / 0.85) !important;
+    color: rgb(var(--c-muted)) !important;
+  }
+  .leaflet-control-attribution a {
+    color: rgb(var(--c-brand)) !important;
+  }
+  .leaflet-bar a {
+    background-color: rgb(var(--c-surface));
+    color: rgb(var(--c-content));
+    border-bottom-color: rgb(var(--c-edge));
+  }
+  .leaflet-bar a:hover {
+    background-color: rgb(var(--c-surface-2));
+  }
+  /* Popups are a fixed light bubble in both themes (Leaflet's own stylesheet is
+     unlayered and forces a white wrapper, so we match it with dark text that
+     stays readable in dark mode rather than inheriting the light theme token). */
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    background-color: #ffffff !important;
+    color: #1f2937 !important; /* gray-800 */
+    box-shadow: 0 6px 20px -6px rgb(15 23 42 / 0.35);
+  }
+  .leaflet-popup-content {
+    margin: 0.625rem 0.75rem;
+  }
+  .leaflet-popup-close-button {
+    color: #9ca3af !important; /* gray-400 */
+  }
+  .atm-popup-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #111827; /* gray-900 — readable on the white bubble in both themes */
+  }
+  .atm-popup-text {
+    margin-top: 0.125rem;
+    font-size: 0.75rem;
+    color: #4b5563; /* gray-600 */
+  }
+  .atm-popup-meta {
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #6b7280; /* gray-500 */
+  }
+}

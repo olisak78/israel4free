@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { ThemeProvider } from './theme/ThemeContext'
@@ -6,12 +7,15 @@ import ScrollToTop from './components/ScrollToTop'
 import Home from './pages/Home'
 import CarLicenses from './pages/CarLicenses'
 import Flights from './pages/Flights'
-import AtmLocations from './pages/AtmLocations'
 import CellAntennas from './pages/CellAntennas'
 import PublicTransit from './pages/PublicTransit'
 import Pharmacies from './pages/Pharmacies'
 import Organization from './pages/Organization'
 import NotFound from './pages/NotFound'
+
+// The ATM page pulls in Leaflet + proj4; load it on demand so those libraries
+// stay out of the initial bundle for every other route.
+const AtmLocations = lazy(() => import('./pages/AtmLocations'))
 
 function App() {
   return (
@@ -30,20 +34,22 @@ function App() {
             <Header />
 
             <main id="main" className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/car-licenses" element={<CarLicenses />} />
-                <Route path="/flights" element={<Flights />} />
-                <Route path="/atm-locations" element={<AtmLocations />} />
-                <Route path="/cell-antennas" element={<CellAntennas />} />
-                <Route path="/public-transit" element={<PublicTransit />} />
-                <Route path="/pharmacies" element={<Pharmacies />} />
-                <Route
-                  path="/organizations/:organizationSlug"
-                  element={<Organization />}
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={null}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/car-licenses" element={<CarLicenses />} />
+                  <Route path="/flights" element={<Flights />} />
+                  <Route path="/atm-locations" element={<AtmLocations />} />
+                  <Route path="/cell-antennas" element={<CellAntennas />} />
+                  <Route path="/public-transit" element={<PublicTransit />} />
+                  <Route path="/pharmacies" element={<Pharmacies />} />
+                  <Route
+                    path="/organizations/:organizationSlug"
+                    element={<Organization />}
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </main>
           </div>
         </BrowserRouter>

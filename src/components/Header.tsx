@@ -1,12 +1,11 @@
-import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-  Car,
+  Building2,
   Home as HomeIcon,
-  MapPin,
   Menu,
-  Radio,
   Settings,
+  Shapes,
   X,
   type LucideIcon,
 } from 'lucide-react'
@@ -14,15 +13,18 @@ import logoLight from '../images/main-logo.png'
 import logoDark from '../images/dark-logo.png'
 import { useLanguage } from '../i18n/useLanguage'
 import { useTheme } from '../theme/useTheme'
-import { datasets, type CategoryId } from '../data/datasets'
+import { scrollToSection } from '../lib/scrollToSection'
 import LanguageSelector from './LanguageSelector'
 import ThemeToggle from './ThemeToggle'
 
+/** A homepage section the nav scrolls to. `'top'` is the hero. */
+type SectionId = 'top' | 'organizations' | 'topics'
+
 interface NavItem {
-  /** Destination route. Category items land on Home with a `?c=` filter. */
+  /** Section this item targets on the homepage. */
+  section: SectionId
+  /** Semantic href — enables hover preview, middle-click, and open-in-new-tab. */
   to: string
-  /** Category this item represents, for active-state matching. */
-  category: CategoryId | 'all'
   icon: LucideIcon
   label: string
 }
@@ -31,38 +33,76 @@ export default function Header() {
   const { t } = useLanguage()
   const { theme } = useTheme()
   const location = useLocation()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<SectionId | ''>('top')
 
   // Light mode shows the full-color lockup; dark mode swaps to the
   // dark-optimized asset. The initial render already reflects the persisted
   // theme, so the correct logo shows with no flash on load or after a toggle.
   const logo = theme === 'dark' ? logoDark : logoLight
 
+  const onHome = location.pathname === '/'
+
   const navItems: NavItem[] = [
-    { to: '/', category: 'all', icon: HomeIcon, label: t.nav.home },
-    { to: '/?c=transport', category: 'transport', icon: Car, label: t.nav.transport },
-    { to: '/?c=locations', category: 'locations', icon: MapPin, label: t.nav.locations },
-    { to: '/?c=infrastructure', category: 'infrastructure', icon: Radio, label: t.nav.infrastructure },
+    { section: 'top', to: '/', icon: HomeIcon, label: t.nav.home },
+    {
+      section: 'organizations',
+      to: '/#organizations',
+      icon: Building2,
+      label: t.nav.organizations,
+    },
+    { section: 'topics', to: '/#topics', icon: Shapes, label: t.nav.topics },
   ]
 
-  // Which nav item should read as active. On a dataset page, highlight the
-  // category that page belongs to; on Home, highlight the active `?c=` filter
-  // (or "Home" when unfiltered).
-  const activeCategory: CategoryId | 'all' = (() => {
-    const onDatasetPage = datasets.find((d) => d.path === location.pathname)
-    if (onDatasetPage) return onDatasetPage.category
-    if (location.pathname === '/') {
-      const c = new URLSearchParams(location.search).get('c')
-      if (c === 'transport' || c === 'locations' || c === 'infrastructure') return c
-      return 'all'
+  // Scroll-spy: on the homepage, reflect the section currently in view. The
+  // sections stack vertically, so we pick the lowest one whose top has passed
+  // below the sticky header. Off the homepage, nothing is active.
+  useEffect(() => {
+    if (!onHome) {
+      setActiveSection('')
+      return
     }
-    return 'all' // unknown route (404) — nothing active
-  })()
+    function onScroll() {
+      const probe = window.scrollY + 140 // just below the sticky header
+      const topOf = (id: string) => {
+        const el = document.getElementById(id)
+        return el ? el.getBoundingClientRect().top + window.scrollY : Infinity
+      }
+      if (probe >= topOf('topics')) setActiveSection('topics')
+      else if (probe >= topOf('organizations')) setActiveSection('organizations')
+      else setActiveSection('top')
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [onHome])
 
-  const isActive = (item: NavItem) =>
-    location.pathname === '/' || datasets.some((d) => d.path === location.pathname)
-      ? item.category === activeCategory
-      : false
+  function handleNavClick(
+    e: React.MouseEvent<HTMLAnchorElement>,
+    item: NavItem,
+  ) {
+    setMenuOpen(false)
+    // Let the browser handle modified clicks (new tab / window) via the href.
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+    e.preventDefault()
+
+    if (onHome) {
+      // Already here — scroll in place (works even on repeat clicks).
+      scrollToSection(item.section)
+    } else if (item.section === 'top') {
+      navigate('/')
+    } else {
+      // Navigate home, then let Home scroll to the requested section.
+      navigate('/', { state: { scrollTo: item.section } })
+    }
+  }
+
+  const isActive = (item: NavItem) => onHome && activeSection === item.section
 
   return (
     <header className="sticky top-0 z-30 border-b border-edge bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
@@ -93,9 +133,10 @@ export default function Header() {
             {navItems.map((item) => {
               const active = isActive(item)
               return (
-                <li key={item.to}>
+                <li key={item.section}>
                   <Link
                     to={item.to}
+                    onClick={(e) => handleNavClick(e, item)}
                     aria-current={active ? 'page' : undefined}
                     className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors motion-reduce:transition-none ${
                       active
@@ -149,11 +190,11 @@ export default function Header() {
             {navItems.map((item) => {
               const active = isActive(item)
               return (
-                <li key={item.to}>
+                <li key={item.section}>
                   <Link
                     to={item.to}
+                    onClick={(e) => handleNavClick(e, item)}
                     aria-current={active ? 'page' : undefined}
-                    onClick={() => setMenuOpen(false)}
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors motion-reduce:transition-none ${
                       active
                         ? 'bg-brand-soft text-brand-soft-fg'

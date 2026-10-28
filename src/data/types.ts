@@ -86,23 +86,40 @@ export interface Flight {
 
 // ─── ATM Locations ─────────────────────────────────────────────────────────
 
-export type AtmService = 'withdrawal' | 'deposit' | 'coins' | 'foreign'
-
-export interface AtmLocation {
+/**
+ * Normalized ATM record, mapped from the data.gov.il CKAN resource by
+ * `data/services/atmService`. Government field names are translated into
+ * meaningful properties; Hebrew bank/address/city values are preserved as-is.
+ *
+ * Booleans are tri-state: `true`/`false` when the source explicitly says so
+ * ("כן"/"לא"), and `null` when the value is missing or unrecognised — unknown
+ * is never conflated with an explicit "No". Coordinates are WGS84 after
+ * conversion, or `null` when the source location could not be resolved.
+ */
+export interface Atm {
+  /** Stable id derived from the datastore row id. */
   id: string
-  bank: string
-  bankHe: string
-  name: string // branch / ATM label
-  nameHe: string
+  bankCode: number | null
+  bankName: string
+  branchCode: number | null
+  subBranchCode: number | null
+  atmNumber: number | null
   address: string
-  addressHe: string
+  additionalAddress: string
   city: string
-  cityHe: string
-  lat: number
-  lng: number
-  accessible: boolean
-  open24h: boolean
-  services: AtmService[]
+  commissionAvailable: boolean | null
+  cashWithdrawalAvailable: boolean | null
+  cashDepositAvailable: boolean | null
+  chequeDepositAvailable: boolean | null
+  envelopeDepositAvailable: boolean | null
+  foreignExchangeAvailable: boolean | null
+  additionalTransactionsAvailable: boolean | null
+  locationDescription: string
+  wheelchairAccessible: boolean | null
+  /** WGS84 latitude, or null when unresolved (excluded from the map). */
+  lat: number | null
+  /** WGS84 longitude, or null when unresolved. */
+  lng: number | null
 }
 
 // ─── Cell Antennas ─────────────────────────────────────────────────────────

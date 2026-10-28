@@ -11,6 +11,11 @@ interface PageShellProps {
   description: string
   /** Optional slot rendered on the heading's trailing edge (e.g. a view toggle). */
   headerActions?: ReactNode
+  /**
+   * Provenance banner. Omit for the default "sample data" notice; pass a node
+   * to replace it (e.g. a real-data source banner); pass `null` to hide it.
+   */
+  provenance?: ReactNode
   children: ReactNode
 }
 
@@ -24,6 +29,7 @@ export default function PageShell({
   title,
   description,
   headerActions,
+  provenance,
   children,
 }: PageShellProps) {
   const t = useT()
@@ -83,11 +89,16 @@ export default function PageShell({
         )}
       </div>
 
-      {/* Sample-data provenance — keeps the demo honest */}
-      <div className="mb-6 flex items-start gap-2 rounded-lg border border-edge bg-surface-2 px-3 py-2 text-xs text-muted">
-        <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-faint" aria-hidden="true" />
-        <p>{t.common.mockNotice}</p>
-      </div>
+      {/* Provenance — the default keeps sample-data pages honest; pages with a
+          real source (or none) override via the `provenance` prop. */}
+      {provenance === undefined ? (
+        <div className="mb-6 flex items-start gap-2 rounded-lg border border-edge bg-surface-2 px-3 py-2 text-xs text-muted">
+          <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-faint" aria-hidden="true" />
+          <p>{t.common.mockNotice}</p>
+        </div>
+      ) : (
+        provenance
+      )}
 
       {children}
     </div>
