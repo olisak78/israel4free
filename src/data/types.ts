@@ -49,39 +49,68 @@ export interface Vehicle {
 // ─── Flights ───────────────────────────────────────────────────────────────
 
 export type FlightDirection = 'departure' | 'arrival'
-export type FlightStatus =
-  | 'scheduled'
-  | 'boarding'
+
+/**
+ * Canonical flight-status category, derived once during normalization from the
+ * source status text (`CHRMINE`). The UI maps each key to a badge tone and a
+ * localized label. `unknown` is the safe bucket for any source value we do not
+ * recognise — it stays readable rather than breaking rendering.
+ */
+export type FlightStatusKey =
+  | 'onTime'
+  | 'notFinal'
+  | 'final'
   | 'departed'
   | 'landed'
+  | 'landing'
   | 'delayed'
   | 'cancelled'
+  | 'unknown'
 
-export interface Airport {
-  code: string // IATA, e.g. "TLV"
-  name: string
-  nameHe: string
-  city: string
-  cityHe: string
-}
-
+/**
+ * Normalized flight record, mapped from the data.gov.il CKAN resource by
+ * `data/services/flightApi`. This is the Israel Airports Authority board for
+ * Ben Gurion Airport — a single feed, not a multi-airport dataset.
+ *
+ * Government field names are translated into meaningful properties. Times are
+ * kept as the source's raw local-airport strings (`YYYY-MM-DDTHH:mm:ss`, no
+ * timezone) so they are never shifted by an inappropriate UTC conversion;
+ * formatting to `HH:mm` happens at the presentation layer. Empty strings denote
+ * "not provided" — the source leaves many optional fields blank.
+ */
 export interface Flight {
+  /** Stable id derived from the datastore row id. */
   id: string
-  flightNumber: string // e.g. "LY 384"
-  airline: string
-  airlineHe: string
+  /** Airline IATA code (CHOPER), e.g. "LY". */
+  airlineCode: string
+  /** Flight number (CHFLTN), e.g. "315". */
+  flightNumber: string
+  /** Airline name (CHOPERD). */
+  airlineName: string
   direction: FlightDirection
-  /** IATA of the Israeli airport this flight belongs to. */
-  airport: string
-  /** Destination (departures) or origin (arrivals). */
-  counterpartCity: string
-  counterpartCityHe: string
-  counterpartCode: string // IATA
-  scheduled: string // "HH:MM" (24h)
-  estimated: string // "HH:MM"
+  /** Scheduled local time (CHSTOL) as a raw 'YYYY-MM-DDTHH:mm:ss' string, or ''. */
+  scheduledTime: string
+  /** Estimated/anticipated local time (CHPTOL) as a raw string, or ''. */
+  estimatedTime: string
+  /** Location IATA code (CHLOC1) — destination for departures, origin for arrivals. */
+  locationCode: string
+  /** Full location description (CHLOC1D), e.g. "ROME - FIUMICINO". */
+  locationDesc: string
+  cityEn: string // CHLOC1T
+  cityHe: string // CHLOC1TH
+  countryEn: string // CHLOCCT
+  countryHe: string // CHLOC1CH
+  /** Terminal number (CHTERM) as a string, or '' when not provided. */
   terminal: string
-  gate?: string
-  status: FlightStatus
+  /** Check-in counter range (CHCINT), e.g. "7-11". Usually only for departures. */
+  checkInCounters: string
+  /** Check-in zone (CHCKZN), e.g. "A". */
+  checkInZone: string
+  /** Raw source status text (CHRMINE / CHRMINH) — kept so unknown values stay readable. */
+  statusEn: string
+  statusHe: string
+  /** Canonical category for badge tone + filtering. */
+  statusKey: FlightStatusKey
 }
 
 // ─── ATM Locations ─────────────────────────────────────────────────────────
@@ -124,23 +153,56 @@ export interface Atm {
 
 // ─── Cell Antennas ─────────────────────────────────────────────────────────
 
-export type CellTechnology = '3G' | '4G' | '5G'
-export type AntennaStatus = 'active' | 'planned' | 'maintenance'
-
+/**
+ * Normalized cellular-antenna record, mapped from the data.gov.il CKAN resource
+ * by `data/services/antennaApi`. This is the Ministry of Environmental
+ * Protection's registry of reported cellular transmission sites — each record
+ * is a reported site with its permits, inspection, and radiation measurements,
+ * NOT necessarily a unique operational antenna.
+ *
+ * The source fields are Hebrew and the dataset is single-language, so values are
+ * preserved as-is (no …He pairs) and displayed verbatim — the app never
+ * translates, transliterates, or reinterprets the source values. Missing fields
+ * are the empty string (text) or `null` (numbers/coordinates); the UI shows a
+ * placeholder rather than a fabricated value. Date fields keep the source's raw
+ * `DD/MM/YYYY` string and are formatted safely at the presentation layer.
+ */
 export interface CellAntenna {
-  id: string // site identifier
-  operator: string
-  operatorHe: string
-  city: string
-  cityHe: string
-  address: string
-  addressHe: string
-  lat: number
-  lng: number
-  technology: CellTechnology
-  band: string // e.g. "700 MHz" — illustrative
-  heightM: number // mast height, illustrative
-  status: AntennaStatus
+  /** Stable id derived from the datastore row id. */
+  id: string
+  /** Site identifier (מס' אתר), e.g. "216464" or "WI6378A"; '' when absent. */
+  siteId: string
+  /** Cellular company (חברה), e.g. "פלאפון". */
+  company: string
+  city: string // עיר
+  address: string // כתובת האתר
+  localAuthority: string // רשות מקומית
+  jurisdiction: string // תחום שיפוט
+  siteType: string // סוג אתר
+  /** Construction permit date (תאריך היתר הקמה), raw 'DD/MM/YYYY' or ''. */
+  constructionPermitDate: string
+  /** Operating permit date (תאריך היתר הפעלה), raw 'DD/MM/YYYY' or ''. */
+  operatingPermitDate: string
+  /** Most recent periodic inspection (בדיקה תקופתית אחרונה), raw or ''. */
+  lastInspectionDate: string
+  /** Radiation-permit status (היתר קרינה), verbatim, e.g. "יש היתר"/"אין היתר". */
+  radiationPermit: string
+  /** Theoretical max power density in µW/cm² (עוצמה מרבית תיאורטית), or null. */
+  maxTheoreticalPower: number | null
+  /** Max measured result as % of the health threshold (תוצאה מירבית ב%), or null. */
+  maxResultPercent: number | null
+  /** Where the max result was recorded (תאור נקודה…); '' when absent. */
+  maxResultLocation: string
+  /** Construction-permit document URL (קובץ הקמה), validated, or null. */
+  constructionPermitUrl: string | null
+  /** Operating-permit document URL (קובץ הפעלה), validated, or null. */
+  operatingPermitUrl: string | null
+  /** Transmission technology (טכנולוגיית שידור), whitespace-normalized, e.g. "דור 3 4 5". */
+  transmissionTech: string
+  /** WGS84 latitude after ITM conversion, or null when unresolved. */
+  lat: number | null
+  /** WGS84 longitude after ITM conversion, or null when unresolved. */
+  lng: number | null
 }
 
 // ─── Public Transit ────────────────────────────────────────────────────────

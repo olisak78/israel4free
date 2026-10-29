@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { ThemeProvider } from './theme/ThemeContext'
 import Header from './components/Header'
@@ -7,15 +7,15 @@ import ScrollToTop from './components/ScrollToTop'
 import Home from './pages/Home'
 import CarLicenses from './pages/CarLicenses'
 import Flights from './pages/Flights'
-import CellAntennas from './pages/CellAntennas'
 import PublicTransit from './pages/PublicTransit'
 import Pharmacies from './pages/Pharmacies'
 import Organization from './pages/Organization'
 import NotFound from './pages/NotFound'
 
-// The ATM page pulls in Leaflet + proj4; load it on demand so those libraries
-// stay out of the initial bundle for every other route.
+// The ATM and Cell Antennas pages pull in Leaflet + proj4; load them on demand
+// so those libraries stay out of the initial bundle for every other route.
 const AtmLocations = lazy(() => import('./pages/AtmLocations'))
+const CellAntennas = lazy(() => import('./pages/CellAntennas'))
 
 function App() {
   return (
@@ -43,6 +43,18 @@ function App() {
                   <Route path="/cell-antennas" element={<CellAntennas />} />
                   <Route path="/public-transit" element={<PublicTransit />} />
                   <Route path="/pharmacies" element={<Pharmacies />} />
+                  {/* The Ministry of Communications org was replaced by the
+                      Ministry of Environmental Protection; redirect the old
+                      slug so existing bookmarks and links keep working. */}
+                  <Route
+                    path="/organizations/ministry-of-communications"
+                    element={
+                      <Navigate
+                        to="/organizations/ministry-of-environmental-protection"
+                        replace
+                      />
+                    }
+                  />
                   <Route
                     path="/organizations/:organizationSlug"
                     element={<Organization />}

@@ -82,3 +82,26 @@ export function parseIsraeliCoords(xRaw: unknown, yRaw: unknown): LatLng | null 
   if (!inLat(lat) || !inLng(lng)) return null
   return { lat, lng }
 }
+
+/**
+ * Convert an unambiguously-projected **Israeli TM Grid (EPSG:2039, ITM)** X/Y
+ * pair to WGS84 {lat, lng}. Unlike {@link parseIsraeliCoords} (which handles a
+ * mixed-CRS source), this always treats the input as ITM with X=easting and
+ * Y=northing in metres — the contract of the cellular-antenna dataset's
+ * `X_ITM`/`Y_ITM` fields. Returns `null` when values are missing, zero,
+ * unparseable, or fall outside Israel after conversion. Never throws.
+ */
+export function parseItmCoords(xRaw: unknown, yRaw: unknown): LatLng | null {
+  const x = toNumber(xRaw)
+  const y = toNumber(yRaw)
+  if (x === null || y === null || x === 0 || y === 0) return null
+
+  try {
+    // proj4 returns [lng, lat] from [easting, northing].
+    const [lng, lat] = itmToWgs84.forward([x, y])
+    if (!inLat(lat) || !inLng(lng)) return null
+    return { lat, lng }
+  } catch {
+    return null
+  }
+}
