@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
+
 export type BadgeTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
 
 interface StatusBadgeProps {
   tone: BadgeTone
-  label: string
+  label: ReactNode
   /** Render a leading status dot (text label is always present, so meaning is
    *  never conveyed by color alone). */
   dot?: boolean

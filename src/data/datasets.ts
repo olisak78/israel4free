@@ -283,23 +283,22 @@ export const datasets: Dataset[] = [
   {
     id: 'pharmacies',
     path: '/pharmacies',
-    title: 'Pharmacies',
-    titleHe: 'בתי מרקחת',
+    title: 'Medical Cannabis Pharmacies',
+    titleHe: 'בתי מרקחת לקנאביס רפואי',
     description:
-      'Locate pharmacies, check opening hours, and find on-call dispensaries open outside regular hours.',
+      'Pharmacies in Israel listed in the government dataset for medical cannabis sales — search by city and filter by delivery.',
     descriptionHe:
-      'איתור בתי מרקחת, בדיקת שעות פתיחה ומציאת בתי מרקחת תורנים הפתוחים מחוץ לשעות הרגילות.',
-    stat: '2,100',
-    statLabel: 'branches',
-    statLabelHe: 'סניפים',
+      'בתי מרקחת בישראל המופיעים במאגר הממשלתי למכירת קנאביס רפואי — חיפוש לפי עיר וסינון לפי משלוחים.',
+    stat: '423',
+    statLabel: 'listed',
+    statLabelHe: 'רשומים',
     icon: Pill,
     category: 'locations',
     organizationId: 'ministry-of-health',
-    keywords: ['pharmacy', 'medicine', 'drug', 'health', 'dispensary'],
-    keywordsHe: ['בית מרקחת', 'תרופה', 'בריאות', 'תורן'],
+    keywords: ['pharmacy', 'cannabis', 'medical cannabis', 'medicine', 'health', 'dispensary'],
+    keywordsHe: ['בית מרקחת', 'קנאביס', 'קנאביס רפואי', 'תרופה', 'בריאות'],
     accentBg: 'bg-rose-50 dark:bg-rose-500/15',
     accentText: 'text-rose-600 dark:text-rose-400',
-    geo: true,
   },
 ]
 

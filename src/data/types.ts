@@ -177,30 +177,33 @@ export interface TransitRoute {
   frequencyMin: number
 }
 
-// ─── Pharmacies ────────────────────────────────────────────────────────────
+// ─── Pharmacies (medical cannabis) ───────────────────────────────────────────
 
-/** Opening hours for one day as "HH:MM-HH:MM", or null when closed. */
-export interface DayHours {
-  open: string
-  close: string
-}
-
+/**
+ * Normalized pharmacy record, mapped from the data.gov.il CKAN resource by
+ * `data/services/pharmacyApi`. This dataset lists pharmacies authorized to sell
+ * medical cannabis — NOT all pharmacies in Israel.
+ *
+ * Only fields the API actually provides are modelled. There is no phone number,
+ * opening hours, open/closed status, or accessibility data in this source, so
+ * none are represented here. `delivery` is tri-state: `true`/`false` when the
+ * source explicitly says so ("כן"/"לא"), and `null` when missing or unrecognised
+ * — unknown is never conflated with an explicit "No".
+ */
 export interface Pharmacy {
+  /** Stable id derived from the datastore row id. */
   id: string
   name: string
-  nameHe: string
-  chain: string
-  chainHe: string
-  address: string
-  addressHe: string
+  street: string
   city: string
-  cityHe: string
-  phone: string
-  lat: number
-  lng: number
-  accessible: boolean
-  /** Open outside standard hours (on-call / night dispensary). */
-  onCall: boolean
-  /** Index 0 = Sunday … 6 = Saturday. null = closed that day. */
-  hours: (DayHours | null)[]
+  /** Free-text notes from the source; empty string when none. */
+  notes: string
+  /** Delivery offered: true/false when stated, null when unknown. */
+  delivery: boolean | null
+  /**
+   * A validated Google Maps directions URL — extracted from the source `map`
+   * field when safe, otherwise built from the address. `null` when neither a
+   * valid link nor any address component is available (the action is omitted).
+   */
+  directionsUrl: string | null
 }
