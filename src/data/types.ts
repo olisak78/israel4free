@@ -205,6 +205,58 @@ export interface CellAntenna {
   lng: number | null
 }
 
+// ─── Bank Branches ───────────────────────────────────────────────────────────
+
+/**
+ * Normalized bank-branch record, mapped from the data.gov.il CKAN resource by
+ * `data/services/bankBranchApi`. There are two language-specific source
+ * resources (Hebrew and English); the active UI language selects which one is
+ * fetched, and each is normalized to this same shape.
+ *
+ * The two resources differ in primitive types — e.g. `Bank_Code`/`Zip_Code`/
+ * `POB` are numbers in Hebrew but strings in English — so identifiers are always
+ * normalized to strings here and never relied on to be numeric. Text fields use
+ * `''` for "not provided" (matching the other datasets); `wheelchairAccessible`
+ * is tri-state (`true`/`false`/`null`) so unknown is never shown as "No"; and
+ * coordinates are WGS84 (`X_Coordinate`=lat, `Y_Coordinate`=lng, verified
+ * against Afula) or `null` when the source location could not be resolved.
+ *
+ * Even in the English resource some values remain Hebrew (e.g. street address,
+ * accessibility) — source values are preserved as-is, never machine-translated.
+ */
+export interface BankBranch {
+  /** Stable id: `${bankCode}-${branchCode}-${rowId}`. */
+  id: string
+  bankCode: string
+  bankName: string
+  branchCode: string
+  branchName: string
+  address: string
+  city: string
+  zipCode: string
+  postOfficeBox: string
+  /** Telephone kept as a readable string (never coerced to a number), or ''. */
+  telephone: string
+  /** Accessible: true/false when stated ("כן"/"לא"), null when unknown. */
+  wheelchairAccessible: boolean | null
+  /** Weekly closing day, localized by the source resource (e.g. "יום א"/"Sunday"). */
+  weeklyClosedDay: string
+  /** Branch classification, localized by the source (e.g. "רגיל"/"Normal"). */
+  branchType: string
+  /** Opening date, raw 'DD/MM/YYYY' or ''. */
+  openDate: string
+  /** Closure date, raw 'DD/MM/YYYY' or '' when none recorded. */
+  closeDate: string
+  /** Merged-bank code (historical), or ''. */
+  mergedBankCode: string
+  /** Merged-branch code (historical), or ''. */
+  mergedBranchCode: string
+  /** WGS84 latitude (source X_Coordinate), or null when unresolved. */
+  lat: number | null
+  /** WGS84 longitude (source Y_Coordinate), or null when unresolved. */
+  lng: number | null
+}
+
 // ─── Public Transit ────────────────────────────────────────────────────────
 
 export type TransitMode = 'bus' | 'train' | 'lightrail'

@@ -12,10 +12,12 @@ import Pharmacies from './pages/Pharmacies'
 import Organization from './pages/Organization'
 import NotFound from './pages/NotFound'
 
-// The ATM and Cell Antennas pages pull in Leaflet + proj4; load them on demand
-// so those libraries stay out of the initial bundle for every other route.
+// The ATM, Cell Antennas, and Bank Branches pages pull in Leaflet + proj4; load
+// them on demand so those libraries stay out of the initial bundle for every
+// other route.
 const AtmLocations = lazy(() => import('./pages/AtmLocations'))
 const CellAntennas = lazy(() => import('./pages/CellAntennas'))
+const BankBranches = lazy(() => import('./pages/BankBranches'))
 
 function App() {
   return (
@@ -41,6 +43,7 @@ function App() {
                   <Route path="/flights" element={<Flights />} />
                   <Route path="/atm-locations" element={<AtmLocations />} />
                   <Route path="/cell-antennas" element={<CellAntennas />} />
+                  <Route path="/bank-branches" element={<BankBranches />} />
                   <Route path="/public-transit" element={<PublicTransit />} />
                   <Route path="/pharmacies" element={<Pharmacies />} />
                   {/* The Ministry of Communications org was replaced by the
