@@ -7,7 +7,6 @@ import ScrollToTop from './components/ScrollToTop'
 import Home from './pages/Home'
 import CarLicenses from './pages/CarLicenses'
 import Flights from './pages/Flights'
-import PublicTransit from './pages/PublicTransit'
 import Pharmacies from './pages/Pharmacies'
 import Organization from './pages/Organization'
 import NotFound from './pages/NotFound'
@@ -44,7 +43,6 @@ function App() {
                   <Route path="/atm-locations" element={<AtmLocations />} />
                   <Route path="/cell-antennas" element={<CellAntennas />} />
                   <Route path="/bank-branches" element={<BankBranches />} />
-                  <Route path="/public-transit" element={<PublicTransit />} />
                   <Route path="/pharmacies" element={<Pharmacies />} />
                   {/* The Ministry of Communications org was replaced by the
                       Ministry of Environmental Protection; redirect the old

@@ -3,7 +3,6 @@ import {
   Plane,
   Landmark,
   Radio,
-  Bus,
   Pill,
   Building2,
   Building,
@@ -284,28 +283,6 @@ export const datasets: Dataset[] = [
     geo: true,
   },
   {
-    id: 'transit',
-    path: '/public-transit',
-    title: 'Public Transit',
-    titleHe: 'תחבורה ציבורית',
-    description:
-      'Bus lines, train routes, and stops countrywide. Search by line number or address to find the nearest stop.',
-    descriptionHe:
-      'קווי אוטובוס, מסלולי רכבת ותחנות בכל הארץ. חיפוש לפי מספר קו או כתובת לאיתור התחנה הקרובה.',
-    stat: '12,500',
-    statLabel: 'stops',
-    statLabelHe: 'תחנות',
-    icon: Bus,
-    category: 'transport',
-    organizationId: 'ministry-of-transport',
-    extraTopics: ['locations'],
-    keywords: ['bus', 'train', 'transit', 'route', 'stop', 'light rail'],
-    keywordsHe: ['אוטובוס', 'רכבת', 'תחבורה', 'קו', 'תחנה', 'רכבת קלה'],
-    accentBg: 'bg-cyan-50 dark:bg-cyan-500/15',
-    accentText: 'text-cyan-600 dark:text-cyan-400',
-    geo: true,
-  },
-  {
     id: 'pharmacies',
     path: '/pharmacies',
     title: 'Medical Cannabis Pharmacies',
@@ -336,7 +313,7 @@ export const POPULAR_DATASET_IDS: string[] = [
   'car-licenses',
   'flights',
   'atms',
-  'transit',
+  'bank-branches',
 ]
 
 /** Resolve the popular dataset ids to records, preserving configured order. */

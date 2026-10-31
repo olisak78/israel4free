@@ -257,40 +257,6 @@ export interface BankBranch {
   lng: number | null
 }
 
-// ─── Public Transit ────────────────────────────────────────────────────────
-
-export type TransitMode = 'bus' | 'train' | 'lightrail'
-
-export interface TransitStop {
-  id: string // stop code
-  name: string
-  nameHe: string
-  city: string
-  cityHe: string
-  lat: number
-  lng: number
-  routes: string[] // route numbers served
-  accessible: boolean
-  shelter: boolean
-}
-
-export interface TransitRoute {
-  id: string
-  number: string
-  mode: TransitMode
-  operator: string
-  operatorHe: string
-  origin: string
-  originHe: string
-  destination: string
-  destinationHe: string
-  /** Ordered intermediate stop names (illustrative). */
-  stops: string[]
-  stopsHe: string[]
-  /** Illustrative headway in minutes — not a live schedule. */
-  frequencyMin: number
-}
-
 // ─── Pharmacies (medical cannabis) ───────────────────────────────────────────
 
 /**

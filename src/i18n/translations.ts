@@ -28,7 +28,7 @@ const en = {
     title:
       'Israel Open Data Portal — Vehicles, Flights, ATMs & More | MyGovIL',
     description:
-      "Search Israeli vehicle licenses, flights, ATMs, pharmacies and public transit in one fast, clean interface over Israel's open government data. Free, no sign-up.",
+      "Search Israeli vehicle licenses, flights, ATMs, bank branches and pharmacies in one fast, clean interface over Israel's open government data. Free, no sign-up.",
     ogLocale: 'en_US',
   },
   brand: {
@@ -401,38 +401,6 @@ const en = {
     sourceName: 'Israel Government Data Portal (data.gov.il)',
     updatedOn: (date: string) => `Fetched ${date}`,
   },
-  transit: {
-    title: 'Public Transit',
-    description:
-      'Explore bus, train, and light-rail stops and routes across Israel. Search stops or browse a line’s full stop sequence.',
-    stopsTab: 'Stops',
-    routesTab: 'Routes',
-    searchStops: 'Search stops',
-    searchStopsPlaceholder: 'Stop name, code, or city…',
-    searchRoutes: 'Search routes',
-    searchRoutesPlaceholder: 'Line number, operator, or city…',
-    cityFilter: 'City',
-    routeFilter: 'Route',
-    allCities: 'All cities',
-    allRoutes: 'All routes',
-    stopCode: 'Stop',
-    servedRoutes: 'Routes',
-    accessible: 'Accessible',
-    shelter: 'Shelter',
-    noShelter: 'No shelter',
-    operator: 'Operator',
-    everyMin: (n: number) => `Every ${n} min`,
-    frequencyNote: 'Illustrative frequency — not live arrivals.',
-    stopsOnLine: 'Stops on this line',
-    selectRoute: 'Select a route',
-    selectRouteBody: 'Choose a line to see its operator, endpoints, and full stop sequence.',
-    backToRoutes: 'Back to routes',
-    mode: {
-      bus: 'Bus',
-      train: 'Train',
-      lightrail: 'Light rail',
-    },
-  },
   antennas: {
     title: 'Cellular Antennas',
     description:
@@ -642,7 +610,7 @@ const he: Dict = {
   meta: {
     title: 'פורטל מידע ממשלתי פתוח — רכב, טיסות, כספומטים ועוד | MyGovIL',
     description:
-      'חיפוש רישוי רכב, טיסות, כספומטים, בתי מרקחת ותחבורה ציבורית בממשק מהיר ונקי מעל מאגרי המידע הממשלתיים הפתוחים של ישראל. חינם, ללא הרשמה.',
+      'חיפוש רישוי רכב, טיסות, כספומטים, סניפי בנקים ובתי מרקחת בממשק מהיר ונקי מעל מאגרי המידע הממשלתיים הפתוחים של ישראל. חינם, ללא הרשמה.',
     ogLocale: 'he_IL',
   },
   brand: {
@@ -1002,38 +970,6 @@ const he: Dict = {
     source: 'מקור הנתונים',
     sourceName: 'פורטל המידע הממשלתי (data.gov.il)',
     updatedOn: (date: string) => `נמשך בתאריך ${date}`,
-  },
-  transit: {
-    title: 'תחבורה ציבורית',
-    description:
-      'חקרו תחנות וקווים של אוטובוס, רכבת ורכבת קלה ברחבי ישראל. חפשו תחנות או עיינו ברצף התחנות המלא של קו.',
-    stopsTab: 'תחנות',
-    routesTab: 'קווים',
-    searchStops: 'חיפוש תחנות',
-    searchStopsPlaceholder: 'שם תחנה, קוד או עיר…',
-    searchRoutes: 'חיפוש קווים',
-    searchRoutesPlaceholder: 'מספר קו, מפעיל או עיר…',
-    cityFilter: 'עיר',
-    routeFilter: 'קו',
-    allCities: 'כל הערים',
-    allRoutes: 'כל הקווים',
-    stopCode: 'תחנה',
-    servedRoutes: 'קווים',
-    accessible: 'נגיש',
-    shelter: 'סככה',
-    noShelter: 'ללא סככה',
-    operator: 'מפעיל',
-    everyMin: (n: number) => `כל ${n} דק׳`,
-    frequencyNote: 'תדירות להמחשה — אינה זמני הגעה בזמן אמת.',
-    stopsOnLine: 'תחנות בקו זה',
-    selectRoute: 'בחרו קו',
-    selectRouteBody: 'בחרו קו כדי לראות את המפעיל, את נקודות הקצה ואת רצף התחנות המלא.',
-    backToRoutes: 'חזרה לקווים',
-    mode: {
-      bus: 'אוטובוס',
-      train: 'רכבת',
-      lightrail: 'רכבת קלה',
-    },
   },
   antennas: {
     title: 'אנטנות סלולר',
